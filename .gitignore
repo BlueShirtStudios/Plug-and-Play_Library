@@ -1,0 +1,19 @@
+# --- Python Specific ---
+__pycache__/
+*.py[cod]
+*$py.class
+.venv
+venv/
+ENV/
+.env
+
+# --- IDEs & Editors ---
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# --- Project ---
+filepaths.py
+demo_use.py
+data_files/

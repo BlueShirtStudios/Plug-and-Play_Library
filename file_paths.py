@@ -1,0 +1,1 @@
+JSONL_STR_PATH = "C:\Danie\BlueShirtsStudio\Document_Handler\V_1.0\data_files\jsonl_test_file.jsonl"
