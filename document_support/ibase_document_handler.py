@@ -3,12 +3,12 @@ from pathlib import Path
 from document_support.document import Document
 
 class iBaseDocumentHandler(ABC):
-    def __init__(self):
-        self._file : Document = None
-        self._keywords = set()
+    def __init__(self, document : Document):
+        self._file = document
+        self._keywords  = set()
     
     @abstractmethod
-    def search_by_keywords(self, keywords : set):
+    def search_by_keywords(self):
         pass
     
     @abstractmethod
@@ -32,7 +32,7 @@ class iBaseDocumentHandler(ABC):
         return self._file
     
     @file.setter
-    def file(self, file : str):
+    def file(self, file : Document):
         self._file = file
         
     @property

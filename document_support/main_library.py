@@ -6,7 +6,7 @@ from document_support.supported_document.jsonl_handler import JSONLHandeler
 class Document_Library():
     def __init__(self):
         #Document Collection Properties
-        self._document_collection = list[Document]
+        self._document_collection : list[Document] = []
         self._doc_collection_max = 10
         self._doc_total = 0
         self._doc_limit = 0
@@ -19,7 +19,7 @@ class Document_Library():
     def _build_handler_dict(self) -> dict:
         #Dictionary stores all available handlers
         handlers ={
-            "jsonl" : JSONLHandeler
+            ".jsonl" : JSONLHandeler
         }
         return handlers
     
@@ -41,14 +41,14 @@ class Document_Library():
         
     def _call_handler(self):
         if self._current_doc._suffix in self._handlers.keys():
-            self._chosen_handler = self._handlers[self._current_doc._suffix]()
+            self._chosen_handler = self._handlers[self._current_doc._suffix](self._current_doc)
             
     def search_by_keword(self, query : str) -> dict:
         doc_num = 0
         while doc_num <= self._doc_limit:
             self._current_doc = self._document_collection[doc_num]
             self._call_handler()
-            self._chosen_handler.keywords(query)
+            self._chosen_handler.keywords = query
             self._chosen_handler.search_by_keywords()
             doc_num += 1
             
