@@ -22,7 +22,7 @@ class JSONLHandeler(iBaseDocumentHandler):
             with open(self._file._file_path, "r", encoding="utf-8") as f:
                 for line in f:
                     if count > n:
-                        exit
+                        break
                         
                     try:
                         data = json.loads(line)
@@ -32,26 +32,47 @@ class JSONLHandeler(iBaseDocumentHandler):
                     except Exception as e:
                         self._error_msg(self._read_jsonl_file_for_keys.__name__, e)
                         continue
-                    
+        
+        except json.JSONDecodeError as e:
+            self._error_msg(self._read_jsonl_file_for_keys.__name__, e)            
+        
         except Exception as e:
             self._error_msg(self._read_jsonl_file_for_keys.__name__, e)
+            
+        print(self._jsonl_keys)
           
     def _error_msg(self, function_name : str, error : str):
         print(f"{function_name} encountered an error: {error}.")
         
     def _read_all_keys(self, data, parent_key : str = ""):
-        for k, v in data.items():
+        sub_dict : dict = {}
+        if isinstance(data, dict):
             try:
-                full_key = f"{parent_key}.{k}" if parent_key else k
+                for cur_key, cur_key_data in data.items():
+                    #Constructs the key
+                    full_key = f"{parent_key}.{cur_key}" if parent_key else cur_key
                     
-                self._jsonl_keys.add(full_key)
-                                    
-                if isinstance(v, dict):
-                    self._jsonl_keys.update(self._read_all_keys(v, full_key))
+                    #Adds the key to the the key list
+                    self._jsonl_keys.add(full_key)
+                    
+                    #Builds schema as we work through the lines
+                    if parent_key:
+                        sub_dict[cur_key] = {}
+                        self._schema[parent_key] = sub_dict
+                    else:
+                        self._schema[cur_key] = {}    
+                    
+                    #Searches through content to determine if there are nested keys
+                    if isinstance(cur_key_data, list):
+                        for item in cur_key_data:
+                            if isinstance(cur_key_data, dict):
+                                self._read_all_keys(item, full_key)
+                                
+                            elif isinstance(item, dict):
+                                self._read_all_keys(item, cur_key)
                     
             except Exception as e:
-                self._error_msg(self._read_all_keys.__name, e)
-                      
+                self._error_msg(self._read_all_keys.__name__, e)           
             
     def search_by_keywords(self):
         #Initalize counter variables
@@ -105,19 +126,19 @@ class JSONLHandeler(iBaseDocumentHandler):
                 try:
                     jsonl_line = json.loads(line)
                     sample.append(jsonl_line)
-                    lines_read += 1
+                    lines_read += 1 
                     
                 except json.JSONDecodeError:
                     continue
                 
-                except Exception as e
+                except Exception as e:
                     self._error_msg(self.get_sample.__name__, e)
                     
         return sample         
      
-    def get_schema(self):
-        print("Getting Schema")
-        
+    def get_schema(self) -> dict:
+        return self._schema
+            
     def query_filter(self, criteria):
         pass
     

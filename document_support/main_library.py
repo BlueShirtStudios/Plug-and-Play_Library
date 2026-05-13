@@ -12,6 +12,8 @@ class Document_Library():
         self._doc_limit = 0
         self._current_doc = None
         
+        #Active Handeler Properties - revisit this
+        
         #Handler Properties
         self._handlers = self._build_handler_dict()
         self._chosen_handler = None
@@ -43,7 +45,7 @@ class Document_Library():
         if self._current_doc._suffix in self._handlers.keys():
             self._chosen_handler = self._handlers[self._current_doc._suffix](self._current_doc)
             
-    def search_by_keword(self, query : str) -> dict:
+    def search_by_keyword(self, query : str) -> dict:
         doc_num = 0
         while doc_num <= self._doc_limit:
             self._current_doc = self._document_collection[doc_num]

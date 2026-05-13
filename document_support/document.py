@@ -15,6 +15,7 @@ class Document():
         self._size = self._file_path.stat().st_size
         self._parent = self._file_path.parent
         self._anchor = self._file_path.anchor
+        self._last_accessed = self._file_path.stat().st_atime
         
         #Other extras
         self._time_addedd = datetime.now()
