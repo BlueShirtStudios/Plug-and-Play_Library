@@ -10,7 +10,7 @@ class JSONLHandeler(iBaseDocumentHandler):
         self._data = None
         self._schema = {}
         self._jsonl_keys = set()
-        self._result_doc_list : list[DocumentResult] = []
+        self._results = DocumentResult
         
         #Intialization method
         self._read_jsonl_file_for_keys()
@@ -38,13 +38,11 @@ class JSONLHandeler(iBaseDocumentHandler):
         
         except Exception as e:
             self._error_msg(self._read_jsonl_file_for_keys.__name__, e)
-            
-        print(self._jsonl_keys)
           
     def _error_msg(self, function_name : str, error : str):
         print(f"{function_name} encountered an error: {error}.")
         
-    def _read_all_keys(self, data, parent_key : str = ""):
+    def _read_all_keys(self, data : dict, parent_key : str = ""):
         sub_dict : dict = {}
         if isinstance(data, dict):
             try:
@@ -76,43 +74,69 @@ class JSONLHandeler(iBaseDocumentHandler):
             
     def search_by_keywords(self):
         #Initalize counter variables
-        total_keys = len(self._jsonl_keys)
-        threshold = total_keys * 0.5
+        threshold = 1
         line_num = 0
         
         #Open the file for search
-        with open (self.file._file_path, "r", encoding="utf-8") as f:
-            for line in f:
-                keys_with_results = 0
-                line_num += 1
-                try:
-                    line_data = json.loads(line)
+        try:
+            with open (self.file._file_path, "r", encoding="utf-8") as f:
+                for line in f:
+                    #Initailize Variables
+                    keys_with_results = 0
+                    line_num += 1
                     
-                    #Each key will be checked for a match
-                    for key in self._jsonl_keys:
-                        value = line_data[key].get(key, None)
-                        if value is None:
-                            continue
+                    line_data = json.loads(line)
+                    keys_with_results = self.search_across_all_keys(line_data)
+                                        
+                    #Results are determined if keywords are found in x amount of keys
+                    if keys_with_results >= threshold:
+                        #Create  instance if needed
+                        if isinstance(self._results, DocumentResult) is False:
+                            self._results = DocumentResult(
+                            name=self.file._full_file_name,
+                            path=self.file._file_path
+                            )
+                            
+                        #Otherwise add to the list content
+                        self._results.add_to_results(line_data)
+                        self._results.update_last_retrieval_time()
                         
-                        if value in self.keywords:
+        except Exception as e:
+            self._error_msg(self.search_by_keywords.__name__, e)
+                    
+    def search_across_all_keys(self, data : dict = {}, keys_with_results : int = 0) -> int:
+        if isinstance(data, dict):      
+            #Each key will be checked for a match
+            for main_key in data.keys():
+                key_value = data[main_key]
+                #Skips empty entries
+                if key_value is None:
+                    continue
+                        
+                #If found to be a string
+                if isinstance(key_value, str):
+                    for item in key_value.split():
+                        if item in self.keywords:
                             keys_with_results += 1
                             
-                    #Results are determined if keywords are found in x amount of keys
-                    if keys_with_results > threshold:
-                        result_doc = DocumentResult(
-                            name=self.file._full_file_name,
-                            path=self.file._file_path,
-                            content=line,
-                            page=line_num
-                        )
+                #If it is a number - First checks if a number is in the keywords
+                for value in self.keywords:
+                    if isinstance(value, int| float):
+                        #On success
+                        if (key_value >= value - 100) or (key_value <= value + 100):
+                            keys_with_results += 1
                         
-                        self._result_doc_list.append(result_doc)
+                #Search if found to be a list
+                if isinstance(key_value, list):
+                    for item in key_value:
+                        if isinstance(item, dict):
+                            self.search_across_all_keys(item, keys_with_results)
                         
-                except json.JSONDecodeError:
-                    continue
-                
-                except Exception as e:
-                    self._error_msg(self.search_by_keywords.__name__, e)
+                        elif isinstance(item, str | int |float |bool):
+                            if item in self.keywords:
+                                keys_with_results += 1   
+                            
+            return keys_with_results
         
     def get_sample(self, allowed_peek_lines : int = 10) -> list:
         sample = []
@@ -144,3 +168,9 @@ class JSONLHandeler(iBaseDocumentHandler):
     
     def format_for_agent(self):
         pass
+    
+    def check_for_result(self) -> int:
+        return len(self._results._relevant_content.keys())
+    
+    def generate_file_dict_key(self) -> str:
+        return f"DOC_{self._results._document_name}"

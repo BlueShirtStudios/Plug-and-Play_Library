@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from pathlib import Path
 from document_support.document import Document
+from document_support.document_result import DocumentResult
 
 class iBaseDocumentHandler(ABC):
     def __init__(self, document : Document):
