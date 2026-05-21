@@ -1,4 +1,5 @@
 import json
+from pathlib import Path
 
 from document_support.document import Document
 from document_support.ibase_document_handler import iBaseDocumentHandler
@@ -11,6 +12,7 @@ class JSONLHandeler(iBaseDocumentHandler):
         self._schema = {}
         self._jsonl_keys = set()
         self._results = DocumentResult
+        self._filter_keys : list = []
         
         #Intialization method
         self._read_jsonl_file_for_keys()
@@ -54,11 +56,25 @@ class JSONLHandeler(iBaseDocumentHandler):
                     self._jsonl_keys.add(full_key)
                     
                     #Builds schema as we work through the lines
+                    #If it has a parent key
                     if parent_key:
-                        sub_dict[cur_key] = {}
-                        self._schema[parent_key] = sub_dict
+                        
+                        #First Check if sub dict has keys
+                        sub_dict = self._schema[parent_key]
+                        if self._is_sub_dict_populated(sub_dict) is True:
+                            
+                            #Checks if key was previously addedd
+                            if self._is_key_already_addedd(sub_dict, cur_key) is False: 
+                                    sub_dict[cur_key] = {}
+                                    self._schema[parent_key] = sub_dict
+                        else:
+                            sub_dict[cur_key] = {}
+                            self._schema[parent_key] = sub_dict
+                        
+                    #If not have a parent key
                     else:
-                        self._schema[cur_key] = {}    
+                        if self._is_key_already_addedd(self._schema, cur_key) is False:
+                            self._schema[cur_key] = {}    
                     
                     #Searches through content to determine if there are nested keys
                     if isinstance(cur_key_data, list):
@@ -70,7 +86,19 @@ class JSONLHandeler(iBaseDocumentHandler):
                                 self._read_all_keys(item, cur_key)
                     
             except Exception as e:
-                self._error_msg(self._read_all_keys.__name__, e)           
+                self._error_msg(self._read_all_keys.__name__, e)   
+                
+    def _is_key_already_addedd(self, dictionary : dict, check_key : str) -> bool:
+        for key in dictionary.keys():
+            if key == check_key:
+                return True
+            
+        return False      
+    
+    def _is_sub_dict_populated(self, prov_dict : dict) -> bool:
+        if len(prov_dict) >= 1:
+            return True
+        else: False
             
     def search_by_keywords(self):
         #Initalize counter variables
@@ -108,6 +136,11 @@ class JSONLHandeler(iBaseDocumentHandler):
         if isinstance(data, dict):      
             #Each key will be checked for a match
             for main_key in data.keys():
+                
+                #Checks if keys should be looked at
+                if main_key in self._filter_keys:
+                    continue
+                    
                 key_value = data[main_key]
                 #Skips empty entries
                 if key_value is None:
@@ -132,7 +165,7 @@ class JSONLHandeler(iBaseDocumentHandler):
                         if isinstance(item, dict):
                             self.search_across_all_keys(item, keys_with_results)
                         
-                        elif isinstance(item, str | int |float |bool):
+                        elif isinstance(item, str| int |float |bool):
                             if item in self.keywords:
                                 keys_with_results += 1   
                             
@@ -163,14 +196,27 @@ class JSONLHandeler(iBaseDocumentHandler):
     def get_schema(self) -> dict:
         return self._schema
             
-    def query_filter(self, criteria):
-        pass
+    def query_filter(self, criteria : str):
+        if criteria not in self._jsonl_keys:
+            return None
+        
+        self._filter_keys.append(criteria)
+        
+    def reset_filter(self):
+        self._filter_keys = []
     
     def format_for_agent(self):
         pass
     
-    def check_for_result(self) -> int:
-        return len(self._results._relevant_content.keys())
+    def retrieve_result(self) -> DocumentResult:
+        if isinstance(self._results, DocumentResult):
+            return self._results
+        else:
+            return None
     
     def generate_file_dict_key(self) -> str:
         return f"DOC_{self._results._document_name}"
+    
+    def get_file(self) -> Document:
+        return self.file
+    
