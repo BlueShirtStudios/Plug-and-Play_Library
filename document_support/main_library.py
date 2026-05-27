@@ -1,6 +1,7 @@
 from pathlib import Path
 
-from document_support.main_src.main_lib_config import Library_Configs
+from document_support.src_support.main_lib_config import LibraryConfigs
+from document_support.src_support.type_checker import InputHandler
 from document_support.document_cls.document import Document
 from document_support.supported_document.jsonl_handler import JSONLHandeler
 
@@ -21,7 +22,8 @@ class Document_Library():
         self._result_dict : dict = {}
         
         #Configurations
-        self._configs = Library_Configs()
+        self._configs = LibraryConfigs()
+        self._iph = InputHandler()
         
     def _build_handler_dict(self) -> dict:
         #Dictionary stores all available handlers
@@ -34,17 +36,26 @@ class Document_Library():
         self._doc_total += 1
         
     def add_new_document(self, file_path : str):
+        #Check if type is correct
+        if self._iph.check_input(file_path, str) is False:
+            self._error_msg("Input Error", self._iph.send_error())
+        
         #Checks if another one can be added
         if self._doc_total < self._doc_collection_max:
-            
-            #Adds document to the library collection
+            #Creates document obj
             file_path = self._convert_to_Path(file_path)
             self._current_doc = Document(file_path)
-            self._document_collection.append(self._current_doc)
-            self._update_doc_total()
             
-            #Creates a unique handler for the object
-            self._active_handlers.append(self._create_handler(self._current_doc._suffix))
+            #Checks if doc type is supported
+            if self._current_doc._suffix in self._configs.supported_documents:
+                self._document_collection.append(self._current_doc)
+                self._update_doc_total()
+                
+                #Creates a unique handler for the object
+                self._active_handlers.append(self._create_handler(self._current_doc._suffix))
+            
+            else:
+                self._error_msg(self.add_new_document.__name__, "This file type is not yet supported.")
             
         else:
             #Max amount of documents are reached
@@ -79,12 +90,34 @@ class Document_Library():
             return result_obj.get_result_dict()
         
     def toggle_result_format_toString(self, val : bool):
+        #Checks input type
+        if self._iph.check_input(val, bool) is False:
+            self._error_msg("Input Error", self._iph.send_error())
+            
+        #Checks if other format toggle is activated
+        if (self._configs.result_format_dict is True) and val is True:
+            self._error_msg(self.toggle_result_format_toString.__name__, "Cannot toggle on, format_toDict is already active.")
+            
+        #Set format on/of for string
         self._configs.result_format_string = val
         
     def toggle_result_format_toDict(self, val : bool):
+        #Checks input type
+        if self._iph.check_input(val, bool) is False:
+            self._error_msg("Input Error", self._iph.send_error())
+            
+        #Checks if other format toggle is activated
+        if (self._configs._result_format_string is True) and val is True:
+            self._error_msg(self.toggle_result_format_toDict.__name__, "Cannot toggle on, format_toString is already active.")
+            
+        #Set format on/of for dict   
         self._configs.result_format_dict = val
             
     def search_document_for(self, query : str):
+        #Check input
+        if self._iph.check_input(query, str) is False:
+            self._error_msg("Input Error", self._iph.send_error())
+        
         #Clean results of previous search
         self._clean_results()
         try:
@@ -106,8 +139,8 @@ class Document_Library():
         except Exception as e:
             self._error_msg(self.search_document_for.__name__, e)
             
-    def _error_msg(self,function_name : str, error : str):
-        print(f"------- ERROR at {function_name} : {error}. -------")
+    def _error_msg(self, error_descript : str, error_code : str):
+        print(f"Encountered Erorr: {error_descript} : {error_code}.")
         
     def retrieve_results(self) -> dict:
         return self._result_dict if self._result_dict else None
@@ -139,13 +172,18 @@ class Document_Library():
         return files_format
     
     def view_file_format(self, file_name : str) -> dict:
+        #Checks input type
+        if self._iph.check_input(file_name, str) is False:
+            self._error_msg("Input Error", self._iph.send_error())
+        
         #Returns a selected file's schema
         suffix = self._get_file_suffix(file_name)
         handler = self._file_with_handler(file_name, suffix)
         if handler:
             return handler.get_schema()
         
-        else: return None
+        else: 
+            return None
             
     def peek_at_all_file_content(self) -> list:
         #Returns all files first few lines
@@ -157,6 +195,10 @@ class Document_Library():
         return files_format
     
     def peek_file_content(self, file_name : str) -> dict:
+        #Checks input type
+        if self._iph.check_input(file_name, str) is False:
+            self._error_msg("Input Error", self._iph.send_error())
+            
         #Return firsy few lines of provfeded file
         suffix = self._get_file_suffix(file_name)
         handler = self._file_with_handler(file_name, suffix)
@@ -166,6 +208,13 @@ class Document_Library():
         else: return None
     
     def apply_filter_for_file(self, file_name : str, filter_criteria : str):
+        #Checks input type
+        if self._iph.check_input(file_name, str) is False:
+            self._error_msg("Input Error", self._iph.send_error())
+            
+        if self._iph.check_input(filter_criteria, str) is False:
+            self._error_msg("Input Error", self._iph.send_error())
+            
         #Get suffix of the file
         suffix = self._get_file_suffix(file_name)
         
@@ -177,12 +226,20 @@ class Document_Library():
                 handler.query_filter(key)   
                     
     def reset_filter_for_file(self, file_name : str):
+        #Checks input type
+        if self._iph.check_input(file_name, str) is False:
+            self._error_msg("Input Error", self._iph.send_error())
+        
         suffix = self._get_file_suffix(file_name)
         handler = self._file_with_handler(file_name, suffix)
         if handler:
             handler.reset_filter()
             
     def remove_file_from_library(self, file_name : str):
+        #Checks input type
+        if self._iph.check_input(file_name, str) is False:
+            self._error_msg("Input Error", self._iph.send_error())
+        
         try:
             for document in self._document_collection:
                 if document._full_file_name == file_name:
