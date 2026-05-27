@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from document_support.main_src.main_lib_config import Library_Configs
 from document_support.document_cls.document import Document
 from document_support.supported_document.jsonl_handler import JSONLHandeler
 
@@ -18,6 +19,9 @@ class Document_Library():
         
         #Result Related Properties
         self._result_dict : dict = {}
+        
+        #Configurations
+        self._configs = Library_Configs()
         
     def _build_handler_dict(self) -> dict:
         #Dictionary stores all available handlers
@@ -61,14 +65,24 @@ class Document_Library():
             
         return None
         
-    def _get_results_of_handler(self, handler : JSONLHandeler) -> str:
+    def _get_results_of_handler(self, handler : JSONLHandeler) -> str | dict:
         #Get the result instance of the handler
         result_obj = handler.retrieve_result()
         if result_obj is None:
             return None
         
-        else:
-            return result_obj.get_details_full()
+        #Determine which format to return
+        if self._configs.result_format_string == True:
+            return result_obj.get_result_str()
+            
+        elif self._configs.result_format_dict == True:
+            return result_obj.get_result_dict()
+        
+    def toggle_result_format_toString(self, val : bool):
+        self._configs.result_format_string = val
+        
+    def toggle_result_format_toDict(self, val : bool):
+        self._configs.result_format_dict = val
             
     def search_document_for(self, query : str):
         #Clean results of previous search
@@ -80,11 +94,11 @@ class Document_Library():
                     #Let the handler search through the provided files
                     handler.keywords = query
                     handler.search_by_keywords()
-                    result_str = self._get_results_of_handler(handler)
+                    result = self._get_results_of_handler(handler)
                     
                     #Appends to library results
-                    if result_str:
-                        self._result_dict[handler.generate_file_dict_key()] = result_str  
+                    if result:
+                        self._result_dict[handler.generate_file_dict_key()] = result
 
                 else:
                     continue
@@ -184,4 +198,4 @@ class Document_Library():
                         self._active_handlers.pop(index)
                         
         except Exception as e:
-            self._error_msg(self.remove_file_from_library.__name__, e)          
+            self._error_msg(self.remove_file_from_library.__name__, e)   

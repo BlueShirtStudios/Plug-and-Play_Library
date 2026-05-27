@@ -108,25 +108,29 @@ class JSONLHandeler(iBaseDocumentHandler):
         try:
             with open (self.file._file_path, "r", encoding="utf-8") as f:
                 for line in f:
-                    #Initailize Variables
-                    keys_with_results = 0
-                    line_num += 1
-                    
-                    line_data = json.loads(line)
-                    keys_with_results = self.search_across_all_keys(line_data)
-                                        
-                    #Results are determined if keywords are found in x amount of keys
-                    if keys_with_results >= threshold:
-                        #Create  instance if needed
-                        if isinstance(self._results, DocumentResult) is False:
-                            self._results = DocumentResult(
-                            name=self.file._full_file_name,
-                            path=self.file._file_path
-                            )
-                            
-                        #Otherwise add to the list content
-                        self._results.add_to_results(line_data)
-                        self._results.update_last_retrieval_time()
+                    try:
+                        #Initailize Variables
+                        keys_with_results = 0
+                        line_num += 1
+                        
+                        line_data = json.loads(line)
+                        keys_with_results = self.search_across_all_keys(line_data)
+                                            
+                        #Results are determined if keywords are found in x amount of keys
+                        if keys_with_results >= threshold:
+                            #Create  instance if needed
+                            if isinstance(self._results, DocumentResult) is False:
+                                self._results = DocumentResult(
+                                name=self.file._full_file_name,
+                                path=self.file._file_path
+                                )
+                                
+                            #Otherwise add to the list content
+                            self._results.add_to_results(line_data)
+                            self._results.update_last_retrieval_time()
+                    except Exception as e:
+                        self._error_msg(self.search_by_keywords.__name__, e)
+                        continue
                         
         except Exception as e:
             self._error_msg(self.search_by_keywords.__name__, e)
@@ -219,3 +223,6 @@ class JSONLHandeler(iBaseDocumentHandler):
     def get_file(self) -> Document:
         return self.file
     
+    def _create_line_error_file(self):
+        #Create a folder with the file containing the error -- Add feature sometime
+        pass
