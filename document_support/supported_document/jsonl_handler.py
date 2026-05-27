@@ -1,14 +1,13 @@
 import json
 from pathlib import Path
 
-from document_support.document import Document
-from document_support.ibase_document_handler import iBaseDocumentHandler
-from document_support.document_result import DocumentResult
+from document_support.document_cls.document import Document
+from document_support.supported_document.ibase_document_handler import iBaseDocumentHandler
+from document_support.document_cls.document_result import DocumentResult
 
 class JSONLHandeler(iBaseDocumentHandler):
     def __init__(self, doc : Document):
         super().__init__(document=doc)
-        self._data = None
         self._schema = {}
         self._jsonl_keys = set()
         self._results = DocumentResult

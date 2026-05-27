@@ -1,6 +1,5 @@
 from datetime import datetime
 from pathlib import Path
-import json
 
 class DocumentResult():
     def __init__(self, name : str, path : Path):

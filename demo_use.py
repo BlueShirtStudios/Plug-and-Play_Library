@@ -1,12 +1,12 @@
-from document_support.main_library import Document_Library
-import file_paths as fp
+from document_support.main_src.main_library import Document_Library
+import demo_file_path as fp
 
 #Initialize the Library
 myLibrary = Document_Library()
 
 #Add files to the library
 myLibrary.add_new_document(fp.JSONL_STR_PATH)
-#myLibrary.add_new_document(fp.SUBNAUTICA_WIKI)
+myLibrary.add_new_document(fp.SUBNAUTICA_WIKI)
 
 #Take a look at the layout of the file
 print(myLibrary.view_all_file_format())
@@ -22,4 +22,7 @@ myLibrary.reset_filter_for_file("jsonl_test_file.jsonl")
 myLibrary.search_document_for("Coral")
 
 #Get the results
-print(myLibrary.retrieve_results())
+print("===================================================================================")
+results = myLibrary.retrieve_results()
+for entry in results:
+     print(results[entry])

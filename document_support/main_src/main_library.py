@@ -1,7 +1,6 @@
 from pathlib import Path
 
-from document_support.document import Document
-from document_support.document_result import DocumentResult
+from document_support.document_cls.document import Document
 from document_support.supported_document.jsonl_handler import JSONLHandeler
 
 class Document_Library():
@@ -96,7 +95,7 @@ class Document_Library():
     def _error_msg(self,function_name : str, error : str):
         print(f"------- ERROR at {function_name} : {error}. -------")
         
-    def retrieve_results(self) -> str:
+    def retrieve_results(self) -> dict:
         return self._result_dict if self._result_dict else None
     
     def _clean_results(self):
