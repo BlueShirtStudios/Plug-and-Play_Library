@@ -1,8 +1,9 @@
-class Library_Configs():
+class LibraryConfigs():
     def __init__(self):
         self._result_format_string = False
         self._result_format_dict = False   
         self._supported_documents : list = []
+        self._initialize_support_documents()
     
     @property
     def result_format_string(self) -> bool:

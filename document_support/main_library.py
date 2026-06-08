@@ -37,7 +37,8 @@ class Document_Library():
         
     def add_new_document(self, file_path : str):
         #Check if type is correct
-        if self._iph.check_input(file_path, str) is False:
+        self._iph.set_input_values(file_path, str)
+        if self._iph.check_input() is False:
             self._error_msg("Input Error", self._iph.send_error())
         
         #Checks if another one can be added
@@ -91,31 +92,34 @@ class Document_Library():
         
     def toggle_result_format_toString(self, val : bool):
         #Checks input type
-        if self._iph.check_input(val, bool) is False:
+        self._iph.set_input_values(val, bool)
+        if self._iph.check_input() is False:
             self._error_msg("Input Error", self._iph.send_error())
             
         #Checks if other format toggle is activated
         if (self._configs.result_format_dict is True) and val is True:
             self._error_msg(self.toggle_result_format_toString.__name__, "Cannot toggle on, format_toDict is already active.")
-            
-        #Set format on/of for string
-        self._configs.result_format_string = val
+        
+        elif (self._configs.result_format_dict is False) and (val is True):
+            self._configs.result_format_string = True
         
     def toggle_result_format_toDict(self, val : bool):
         #Checks input type
-        if self._iph.check_input(val, bool) is False:
+        self._iph.set_input_values(val, bool)
+        if self._iph.check_input() is False:
             self._error_msg("Input Error", self._iph.send_error())
             
         #Checks if other format toggle is activated
         if (self._configs._result_format_string is True) and val is True:
             self._error_msg(self.toggle_result_format_toDict.__name__, "Cannot toggle on, format_toString is already active.")
             
-        #Set format on/of for dict   
-        self._configs.result_format_dict = val
+        elif (self._configs.result_format_string is False) and (val is True):
+            self._configs.result_format_dict = True
             
-    def search_document_for(self, query : str):
+    def search_library(self, query : str):
         #Check input
-        if self._iph.check_input(query, str) is False:
+        self._iph.set_input_values(query, str)
+        if self._iph.check_input() is False:
             self._error_msg("Input Error", self._iph.send_error())
         
         #Clean results of previous search
@@ -156,12 +160,12 @@ class Document_Library():
         #Search which handler is related to the provided file and return the handler
         for handler in self._active_handlers:
             doc = handler.get_file()
-            if (doc.get_file_name() == file_name) and (doc.get_file_suffix() == suffix):
+            if (doc._full_file_name == file_name) and (doc._suffix == suffix):
                 return handler
             
             else: return None
         
-    def view_all_file_format(self) -> dict:
+    def view_all_files_format(self) -> dict:
         #Returns all active handler's file schema
         files_format = {}
         count = 0
@@ -173,7 +177,8 @@ class Document_Library():
     
     def view_file_format(self, file_name : str) -> dict:
         #Checks input type
-        if self._iph.check_input(file_name, str) is False:
+        self._iph.set_input_values(file_name, str)
+        if self._iph.check_input() is False:
             self._error_msg("Input Error", self._iph.send_error())
         
         #Returns a selected file's schema
@@ -185,7 +190,7 @@ class Document_Library():
         else: 
             return None
             
-    def peek_at_all_file_content(self) -> list:
+    def peek_all_files_content(self) -> list:
         #Returns all files first few lines
         files_format = {}
         count = 0
@@ -196,7 +201,8 @@ class Document_Library():
     
     def peek_file_content(self, file_name : str) -> dict:
         #Checks input type
-        if self._iph.check_input(file_name, str) is False:
+        self._iph.set_input_values(file_name, str)
+        if self._iph.check_input() is False:
             self._error_msg("Input Error", self._iph.send_error())
             
         #Return firsy few lines of provfeded file
@@ -209,10 +215,12 @@ class Document_Library():
     
     def apply_filter_for_file(self, file_name : str, filter_criteria : str):
         #Checks input type
-        if self._iph.check_input(file_name, str) is False:
+        self._iph.set_input_values(file_name, str)
+        if self._iph.check_input() is False:
             self._error_msg("Input Error", self._iph.send_error())
             
-        if self._iph.check_input(filter_criteria, str) is False:
+        self._iph.set_input_values(filter_criteria, str)
+        if self._iph.check_input() is False:
             self._error_msg("Input Error", self._iph.send_error())
             
         #Get suffix of the file
@@ -226,8 +234,9 @@ class Document_Library():
                 handler.query_filter(key)   
                     
     def reset_filter_for_file(self, file_name : str):
-        #Checks input type
-        if self._iph.check_input(file_name, str) is False:
+        #Checks input 
+        self._iph.set_input_values(file_name, str)
+        if self._iph.check_input() is False:
             self._error_msg("Input Error", self._iph.send_error())
         
         suffix = self._get_file_suffix(file_name)
@@ -237,7 +246,8 @@ class Document_Library():
             
     def remove_file_from_library(self, file_name : str):
         #Checks input type
-        if self._iph.check_input(file_name, str) is False:
+        self._iph.set_input_values(file_name, str)
+        if self._iph.check_input() is False:
             self._error_msg("Input Error", self._iph.send_error())
         
         try:

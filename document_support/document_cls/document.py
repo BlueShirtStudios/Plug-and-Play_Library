@@ -26,9 +26,3 @@ class Document():
             return False
         
         else: return True
-        
-    def get_file_name(self) -> str:
-        return self._full_file_name
-    
-    def get_file_suffix(self) -> str:
-        return self._suffix
