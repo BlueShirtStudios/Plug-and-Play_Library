@@ -1,32 +1,37 @@
-# Plug-and-Play Library
-<h2>What is This?</h2>
-<body>
-  <par>
-    This library provides easy access to all you file's data with already added tools. Its simple you upload your file you want, from         there   the stage is yours. You can search, filter, peek, get the schema and more. This is created as a small tool for small or major     LLM setups. <br>
-    My biggest problem when working with LLMs were the lack of knowledge, now I know that a RAG system is used, that is merely the tip of     the ice berg and overwelms anyone tring to work with a LLM. This tool is created to serve a small part in *your* own RAG system,          allowing you to customize your LLM workflow to your liking. 
-  </par>
-  
-  Outside LLMs, a library proving with ready to read results without managing loops, data extraction, formats and dictionary keys with keys lifts a major burden of anyones shoulder.
+# Plug-and-Play Document Handler Library
 
-<h2>What is it  Capable Of</h2>
-<par>
-   As of now the major functions are: 
-  <li>Search using Keywords</li>
-  <li>Filter data accrording to criteria</li>
-  <li>Get the file format</li>
-  <li>Take a look at the file without opening it</li> 
-</par>
+A lightweight, local, and flexible document utility designed to strip away the overhead of manual data extraction, complex loops, and nested dictionaries. Whether you are building a custom LLM pipeline or just need quick, multi-format file parsing, this tool gives you instant access to your data.
 
+---
 
-<h2>Supported Files</h2>
-<par>
-   None of these work as of now, but these are the planned ones
-  <li>JSONL</li>
-  <li>JSON</li>
-  <li>CSV</li>
-  <li>PDF</li> 
-</par>
+## 🚀 The Motivation
 
+When building custom AI orchestration workflows or experimenting with Retrieval-Augmented Generation (RAG) systems, managing file ingestion can quickly become overwhelming. 
 
-Expect more features coming as development progresses...
-</body>
+This library was built to solve that exact problem. It acts as a dedicated component in your data pipeline, handling the heavy lifting of document parsing so you can focus entirely on your application's logic, agent routing, or prompt engineering.
+
+---
+
+## ✨ Features
+
+* **Keyword Search:** Instantly query across all documents in your library.
+* **Targeted Filtering:** Narrow down your searches by applying or resetting column/key filters on specific files.
+* **Schema Discovery:** View the data layout and structure of your files programmatically without manually opening them.
+* **Data Peeking:** Take a quick glance at the underlying content of single or multiple files.
+* **Flexible Formatting:** Toggle search results to return as raw strings or Python dictionaries.
+
+---
+
+## 📂 Supported File Formats
+
+The library is designed around a universal parsing framework with support for the following formats:
+
+* [x] **JSONL** (Supported)
+* [ ] **JSON** (Planned)
+* [ ] **CSV** (Planned)
+* [ ] **PDF** (Planned)
+
+---
+
+## 🛠️ Quick Start & Usage
+View the demo_use.py file to check how to utilize the library to its max
