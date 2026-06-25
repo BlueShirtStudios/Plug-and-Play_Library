@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
-from document_support.document_cls.document import Document
-from document_support.document_cls.document_result import DocumentResult
+import re
+from plp_library.document_cls.document import Document
+from plp_library.document_cls.document_result import DocumentResult
 
 class iBaseDocumentHandler(ABC):
     def __init__(self, document : Document):
@@ -41,8 +42,10 @@ class iBaseDocumentHandler(ABC):
     
     @keywords.setter
     def keywords(self, query : str):
+        query = re.sub(r'[^a-zA-Z0-9 ]', '', query)
         for word in query.split():
             if len(word) > 3:
-                self._keywords.add(word)
+                
+                self._keywords.add(word.lower())
                 
             else: continue

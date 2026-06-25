@@ -1,9 +1,9 @@
 import json
 from pathlib import Path
 
-from document_support.document_cls.document import Document
-from document_support.supported_document.ibase_document_handler import iBaseDocumentHandler
-from document_support.document_cls.document_result import DocumentResult
+from plp_library.document_cls.document import Document
+from plp_library.supported_document.ibase_document_handler import iBaseDocumentHandler
+from plp_library.document_cls.document_result import DocumentResult
 
 class JSONLHandeler(iBaseDocumentHandler):
     def __init__(self, doc : Document):
@@ -152,7 +152,7 @@ class JSONLHandeler(iBaseDocumentHandler):
                 #If found to be a string
                 if isinstance(key_value, str):
                     for item in key_value.split():
-                        if item in self.keywords:
+                        if item.lower() in self.keywords:
                             keys_with_results += 1
                             
                 #If it is a number - First checks if a number is in the keywords

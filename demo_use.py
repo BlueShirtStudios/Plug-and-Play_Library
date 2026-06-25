@@ -1,4 +1,4 @@
-from document_support.main_library import Document_Library
+from plp_library.main_library import Document_Library
 import demo_file_path as fp
 
 #Initialize the Library
@@ -57,7 +57,7 @@ print("=========================================================================
 myLibrary.apply_filter_for_file("jsonl_test_file.jsonl", "categories")
 
 #Search Through the Library
-myLibrary.search_library("Coral")
+myLibrary.search_library("Do you have information on coral?")
 
 #Get the results
 results = myLibrary.retrieve_results()
@@ -70,7 +70,7 @@ print("=========================================================================
 print("-- Now remove filter and search again --")
 myLibrary.reset_filter_for_file("jsonl_test_file.jsonl")
 #Search Through the Library
-myLibrary.search_library("Coral")
+myLibrary.search_library("Do you have information on coral?")
 
 #Get the results
 results = myLibrary.retrieve_results()

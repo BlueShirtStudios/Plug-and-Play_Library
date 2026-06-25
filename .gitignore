@@ -16,3 +16,7 @@ ENV/
 # --- Project ---
 data_files/
 demo_file_path.py
+
+# --- Package Stuff ---\
+plp_library.egg-info/
+build/

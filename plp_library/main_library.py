@@ -1,9 +1,9 @@
 from pathlib import Path
 
-from document_support.src_support.main_lib_config import LibraryConfigs
-from document_support.src_support.type_checker import InputHandler
-from document_support.document_cls.document import Document
-from document_support.supported_document.jsonl_handler import JSONLHandeler
+from plp_library.src_support.main_lib_config import LibraryConfigs
+from plp_library.src_support.type_checker import InputHandler
+from plp_library.document_cls.document import Document
+from plp_library.supported_document.jsonl_handler import JSONLHandeler
 
 class Document_Library():
     def __init__(self):
@@ -141,7 +141,7 @@ class Document_Library():
                     continue
                 
         except Exception as e:
-            self._error_msg(self.search_document_for.__name__, e)
+            self._error_msg(self.search_library.__name__, e)
             
     def _error_msg(self, error_descript : str, error_code : str):
         print(f"Encountered Erorr: {error_descript} : {error_code}.")
